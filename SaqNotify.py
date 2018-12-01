@@ -85,19 +85,22 @@ def notify(description, DrinkName, StartTime, EndTime):
 	event = service.events().insert(calendarId='primary', body=event).execute()
 	
 def main():
-	stock_status = check_availability(test_url)
+	stock_status = check_availability(product_url)
 	
 	# If drink is not completely unavailable, create event 1 minute in the future
 	# Email reminder in notify() is set to one minute before, sending email immediately
 	if stock_status[0] is False:
-		desc = f'Quantity Available Online: {stock_status[2]}\nAvailable in Store: {stock_status[3]}\nLink: {test_url}'
-		drink_name = stock_status[1]
-		start = datetime.datetime.now() + datetime.timedelta(minutes=1)
-		end = start + datetime.timedelta(minutes=5)
-		start_time = f'{start.year}-{start.month}-{start.day}T{start.hour}:{start.minute}:{start.second}'
-		end_time = f'{end.year}-{end.month}-{end.day}T{end.hour}:{end.minute}:{end.second}'
-		notify(desc, drink_name, start_time, end_time)
-		print("Success")
+		if stock_status[2] == 0 and stock_status[3] == "No":
+			print("Not in stock in store or online")
+		else:
+			desc = f'Quantity Available Online: {stock_status[2]}\nAvailable in Store: {stock_status[3]}\nLink: {product_url}'
+			drink_name = stock_status[1]
+			start = datetime.datetime.now() + datetime.timedelta(minutes=1)
+			end = start + datetime.timedelta(minutes=5)
+			start_time = f'{start.year}-{start.month}-{start.day}T{start.hour}:{start.minute}:{start.second}'
+			end_time = f'{end.year}-{end.month}-{end.day}T{end.hour}:{end.minute}:{end.second}'
+			notify(desc, drink_name, start_time, end_time)
+			print("Success")
 	# No event created if drink is unavailable
 	else:
 		print("Completely unavailable")
